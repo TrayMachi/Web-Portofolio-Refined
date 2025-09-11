@@ -153,9 +153,9 @@ body {
         background: hsl(var(--primary) / 0.8);
     }
 
-    /* Smooth scroll behavior */
+    /* Remove default smooth scroll - using Framer Motion instead */
     html {
-        scroll-behavior: smooth;
+        scroll-behavior: auto;
     }
 
     /* Better focus states */

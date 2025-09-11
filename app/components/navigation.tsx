@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "~/components/ui/theme-toggle";
 import { SECTION_IDS } from "~/lib/constants";
+import { useSmoothScroll } from "~/lib/smooth-scroll";
 import { cn } from "~/lib/utils";
 
 const NAV_ITEMS = [
@@ -16,6 +17,7 @@ const NAV_ITEMS = [
 export function Navigation() {
     const [isOpen, setIsOpen] = useState(false);
     const [activeSection, setActiveSection] = useState<string>(SECTION_IDS.home);
+    const { scrollToSection } = useSmoothScroll();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -39,12 +41,9 @@ export function Navigation() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    const scrollToSection = (sectionId: string) => {
-        const element = document.getElementById(sectionId);
-        if (element) {
-            element.scrollIntoView({ behavior: "smooth" });
-            setIsOpen(false);
-        }
+    const handleScrollToSection = (sectionId: string) => {
+        scrollToSection(sectionId);
+        setIsOpen(false);
     };
 
     return (
@@ -61,7 +60,7 @@ export function Navigation() {
                             {NAV_ITEMS.map(item => (
                                 <li key={item.id}>
                                     <button
-                                        onClick={() => scrollToSection(item.id)}
+                                        onClick={() => handleScrollToSection(item.id)}
                                         className={cn(
                                             "text-sm font-medium transition-colors relative py-2 px-3 rounded-full",
                                             activeSection === item.id
@@ -142,7 +141,7 @@ export function Navigation() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
-                                    onClick={() => scrollToSection(item.id)}
+                                    onClick={() => handleScrollToSection(item.id)}
                                     className={cn(
                                         "text-2xl font-semibold transition-colors",
                                         activeSection === item.id

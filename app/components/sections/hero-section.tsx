@@ -8,9 +8,11 @@ import Typed from "typed.js";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { PERSONAL_INFO, SECTION_IDS, SOCIAL_LINKS, TYPING_STRINGS } from "~/lib/constants";
+import { useSmoothScroll } from "~/lib/smooth-scroll";
 
 export function HeroSection() {
     const typedRef = useRef<HTMLSpanElement>(null);
+    const { scrollToSection } = useSmoothScroll();
 
     useEffect(() => {
         if (typedRef.current) {
@@ -28,10 +30,7 @@ export function HeroSection() {
     }, []);
 
     const scrollToContact = () => {
-        const element = document.getElementById(SECTION_IDS.contact);
-        if (element) {
-            element.scrollIntoView({ behavior: "smooth" });
-        }
+        scrollToSection(SECTION_IDS.contact);
     };
 
     const trackCVDownload = async () => {

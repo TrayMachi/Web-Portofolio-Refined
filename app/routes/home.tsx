@@ -5,6 +5,8 @@ import { ExperienceSection } from "~/components/sections/experience-section";
 import { HeroSection } from "~/components/sections/hero-section";
 import { ProjectsSection } from "~/components/sections/projects-section";
 import { SkillsSection } from "~/components/sections/skills-section";
+import { BackToTop } from "~/components/ui/back-to-top";
+import { ScrollProgress } from "~/components/ui/scroll-progress";
 import { SECTION_IDS } from "~/lib/constants";
 import type { Route } from "./+types/home";
 
@@ -24,8 +26,7 @@ export function meta({}: Route.MetaArgs) {
         { property: "og:title", content: "Tristan Agra Yudhistira | Software Engineer" },
         {
             property: "og:description",
-            content:
-                "Portfolio of Tristan Agra Yudhistira - Computer Science student and aspiring Software Engineer.",
+            content: "Portfolio of Tristan Agra Yudhistira - Computer Science student and aspiring Software Engineer.",
         },
         { property: "og:type", content: "website" },
         { property: "og:image", content: "/Profile/tristan.png" },
@@ -36,6 +37,7 @@ export function meta({}: Route.MetaArgs) {
 export default function Home() {
     return (
         <div className="min-h-screen bg-background">
+            <ScrollProgress />
             <Navigation />
 
             <main className="relative">
@@ -63,6 +65,8 @@ export default function Home() {
                     <ContactSection />
                 </section>
             </main>
+
+            <BackToTop />
         </div>
     );
 }
