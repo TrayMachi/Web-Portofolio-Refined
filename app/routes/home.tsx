@@ -40,7 +40,7 @@ export default function Home() {
             <ScrollProgress />
             <Navigation />
 
-            <main className="relative">
+            <main className="relative max-w-screen overflow-hidden">
                 <section id={SECTION_IDS.home}>
                     <HeroSection />
                 </section>
