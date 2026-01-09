@@ -1,101 +1,34 @@
 import { motion } from "framer-motion";
 import { AlertCircle, CheckCircle, Github, Linkedin, Mail, MapPin, Send } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import { Form, useActionData, useNavigation } from "react-router";
 
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { PERSONAL_INFO, SOCIAL_LINKS } from "~/lib/constants";
 
 export function ContactSection() {
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        message: "",
-    });
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const actionData = useActionData();
+    const navigation = useNavigation();
     const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-        setSubmitStatus("idle");
+    const isSubmitting = navigation.state === "submitting";
 
-        try {
-            const webhookUrl = 'https://discord.com/api/webhooks/1415661871821885461/GNv8Xr0G3vbrAQFb9vgNTqUjVJKD_4ZbPXvEJ5Y2NdHNrVAiwGns93Eahh1OmigAHSWX';
-
-            if (!webhookUrl) {
-                throw new Error("Discord webhook URL not configured");
+    useEffect(() => {
+        if (actionData) {
+            if (actionData.success) {
+                setSubmitStatus("success");
+                // Auto-hide success message after 5 seconds
+                setTimeout(() => setSubmitStatus("idle"), 5000);
+            } else {
+                setSubmitStatus("error");
+                // Auto-hide error message after 5 seconds
+                setTimeout(() => setSubmitStatus("idle"), 5000);
             }
-
-            // Create Discord embed
-            const embed = {
-                title: "🌐 New Portfolio Contact",
-                color: 0x6366f1, // Primary color
-                fields: [
-                    {
-                        name: "👤 Name",
-                        value: formData.name,
-                        inline: true,
-                    },
-                    {
-                        name: "📧 Email",
-                        value: formData.email,
-                        inline: true,
-                    },
-                    {
-                        name: "💬 Message",
-                        value: formData.message || "No message provided",
-                        inline: false,
-                    },
-                ],
-                timestamp: new Date().toISOString(),
-                footer: {
-                    text: "Portfolio Contact Form",
-                },
-            };
-
-            // Send to Discord webhook
-            const response = await fetch(webhookUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    embeds: [embed],
-                    username: "Portfolio Bot",
-                    avatar_url: "https://cdn.discordapp.com/emojis/🌐.png",
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            setSubmitStatus("success");
-            // Reset form
-            setFormData({ name: "", email: "", message: "" });
-
-            // Auto-hide success message after 5 seconds
-            setTimeout(() => setSubmitStatus("idle"), 5000);
-        } catch (error) {
-            console.error("Failed to send message:", error);
-            setSubmitStatus("error");
-
-            // Auto-hide error message after 5 seconds
-            setTimeout(() => setSubmitStatus("idle"), 5000);
-        } finally {
-            setIsSubmitting(false);
         }
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setFormData(prev => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-        }));
-    };
+    }, [actionData]);
 
     return (
         <div className="py-20 px-6">
@@ -229,7 +162,7 @@ export function ContactSection() {
                                 <CardTitle>Send a Message</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <form onSubmit={handleSubmit} className="space-y-6">
+                                <Form method="post" className="space-y-6">
                                     <div className="space-y-2">
                                         <label htmlFor="name" className="text-sm font-medium">
                                             Name
@@ -239,8 +172,6 @@ export function ContactSection() {
                                             name="name"
                                             type="text"
                                             required
-                                            value={formData.name}
-                                            onChange={handleChange}
                                             className="w-full px-3 py-2 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                                             placeholder="Your name"
                                         />
@@ -255,8 +186,6 @@ export function ContactSection() {
                                             name="email"
                                             type="email"
                                             required
-                                            value={formData.email}
-                                            onChange={handleChange}
                                             className="w-full px-3 py-2 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                                             placeholder="your.email@example.com"
                                         />
@@ -271,8 +200,6 @@ export function ContactSection() {
                                             name="message"
                                             required
                                             rows={6}
-                                            value={formData.message}
-                                            onChange={handleChange}
                                             className="w-full px-3 py-2 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors resize-none"
                                             placeholder="Tell me about your project or just say hello!"
                                         />
@@ -327,7 +254,7 @@ export function ContactSection() {
                                             </>
                                         )}
                                     </Button>
-                                </form>
+                                </Form>
                             </CardContent>
                         </Card>
                     </motion.div>
@@ -341,9 +268,7 @@ export function ContactSection() {
                     viewport={{ once: true }}
                     className="mt-20 pt-8 border-t border-border/50 text-center"
                 >
-                    <p className="text-muted-foreground">
-                        © 2025 {PERSONAL_INFO.name}.
-                    </p>
+                    <p className="text-muted-foreground">© 2025 {PERSONAL_INFO.name}.</p>
                 </motion.div>
             </div>
         </div>

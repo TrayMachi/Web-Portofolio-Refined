@@ -3,6 +3,7 @@ import { Download, Mail } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import { useSubmit } from "react-router";
 import Typed from "typed.js";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -13,6 +14,7 @@ import { useSmoothScroll } from "~/lib/smooth-scroll";
 export function HeroSection() {
     const typedRef = useRef<HTMLSpanElement>(null);
     const { scrollToSection } = useSmoothScroll();
+    const submit = useSubmit();
 
     useEffect(() => {
         if (typedRef.current) {
@@ -35,9 +37,6 @@ export function HeroSection() {
 
     const trackCVDownload = async () => {
         try {
-            const webhookUrl =
-                "https://discord.com/api/webhooks/1415661871821885461/GNv8Xr0G3vbrAQFb9vgNTqUjVJKD_4ZbPXvEJ5Y2NdHNrVAiwGns93Eahh1OmigAHSWX";
-
             // Get user agent and other browser info
             const userAgent = navigator.userAgent;
             const platform = navigator.platform;
@@ -45,7 +44,7 @@ export function HeroSection() {
             const screenResolution = `${screen.width}x${screen.height}`;
             const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-            // Get approximate location info (from timezone)
+            // Get timestamp
             const now = new Date();
             const timestamp = now.toISOString();
 
@@ -64,65 +63,20 @@ export function HeroSection() {
                 console.log("Location detection failed:", error);
             }
 
-            // Create Discord embed
-            const embed = {
-                title: "📄 CV Downloaded",
-                color: 0x00ff00, // Green color for download event
-                fields: [
-                    {
-                        name: "🌍 Location",
-                        value: locationInfo,
-                        inline: true,
-                    },
-                    {
-                        name: "🕒 Timezone",
-                        value: timezone,
-                        inline: true,
-                    },
-                    {
-                        name: "💻 Platform",
-                        value: platform,
-                        inline: true,
-                    },
-                    {
-                        name: "🌐 Browser",
-                        value: userAgent,
-                        inline: false,
-                    },
-                    {
-                        name: "📱 Screen",
-                        value: screenResolution,
-                        inline: true,
-                    },
-                    {
-                        name: "🌏 Language",
-                        value: language,
-                        inline: true,
-                    },
-                    {
-                        name: "🔗 Referrer",
-                        value: referrer,
-                        inline: true,
-                    },
-                ],
-                timestamp: timestamp,
-                footer: {
-                    text: "Portfolio CV Download Tracker",
-                },
-            };
+            // Create form data to submit to server action
+            const formData = new FormData();
+            formData.append("_action", "cv_download");
+            formData.append("location", locationInfo);
+            formData.append("timezone", timezone);
+            formData.append("platform", platform);
+            formData.append("userAgent", userAgent);
+            formData.append("screenResolution", screenResolution);
+            formData.append("language", language);
+            formData.append("referrer", referrer);
+            formData.append("timestamp", timestamp);
 
-            // Send to Discord webhook
-            await fetch(webhookUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    embeds: [embed],
-                    username: "CV Download Bot",
-                    avatar_url: "https://cdn.discordapp.com/emojis/📄.png",
-                }),
-            });
+            // Submit to server action
+            submit(formData, { method: "post" });
         } catch (error) {
             console.error("Failed to track CV download:", error);
         }
